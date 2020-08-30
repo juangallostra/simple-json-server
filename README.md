@@ -21,7 +21,7 @@ optional arguments:
 ### Examples
 
 ```sh
-$ python server.py -u my-fake-website.com -p 5000 -f customer_api.json
+$ python server.py -u my-fake-website.com -p 5000 -f db.json
 ```
 
 ### Running Multiple instances
