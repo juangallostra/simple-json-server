@@ -6,8 +6,6 @@ This project was inspired by [tipycode's json-server](https://github.com/typicod
 
 ## Usage
 
-To run a 
-
 ```
 usage: server.py [-h] [-p PORT] [-f FILE] [-u URL]
 
@@ -19,6 +17,8 @@ optional arguments:
 ```
 
 ### Examples
+
+To specify a hostname, port and JSON file from where to extract data and endpoints:
 
 ```sh
 $ python server.py -u my-fake-website.com -p 5000 -f db.json
