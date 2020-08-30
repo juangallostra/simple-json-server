@@ -1,54 +1,25 @@
 {
-  "api/Metadata": {
-    "info": {
-      "title": "Google Calendar Implementation",
-      "description": "Manage and monitor bookings",
-      "version": null,
-      "contacts": [
-        {
-          "name": "Iskander Sierra",
-          "url": null,
-          "email": "isierra@jgingenieros.es"
-        }
-      ]
-    },
-    "version": "0.1",
-    "serviceKey": "iris.booking",
-    "serviceType": "implementation",
-    "configEndpoints": [
+  "api/metadata": {
+    "info": "Provides customer info",
+    "version":"0.1"
+  },
+  "api/customers": {
+    "data": [
       {
-        "info": {
-          "title": "Calendars",
-          "description": "Calendars used for booking"
-        },
-        "configKey": "calendars",
-        "target": "tenant",
-        "allowExportSamples": true,
-        "allowExport": true,
-        "allowImport": true,
-        "allowView": true,
-        "contentType": "text/csv"
+        "name": "Alex Honnold",
+        "email":"ahonnold@climber.com",
+        "address": "his van"
       },
       {
-        "info": {
-          "title": "Credentials",
-          "description": "Credentials for connecting to the provider"
-        },
-        "configKey": "credentials",
-        "target": "tenant",
-        "allowExportSamples": false,
-        "allowExport": true,
-        "allowImport": true,
-        "allowView": true,
-        "contentType": "text/csv"
+        "name":"Adam Ondra",
+        "email":"aondra@sport-climber.com",
+        "address":"always traveling"
+      },
+      {
+        "name":"Jimmy Webb",
+        "email":"jwebb@boulderer.com",
+        "address":"Looking for nice boulders"
       }
     ]
-  },
-  "api/calendars": {
-    "calendars": [
-      { "name": "Sala Juntas", "description": "La sala de juntas" },
-      { "name": "Despacho 1", "description": "Un despacho de reuniones" }
-    ]
-  },
-  "api/credentials": {}
+  }
 }
