@@ -10,7 +10,8 @@ import datetime
 import socket
 import struct
 
-LOCALHOST = "127.0.0.1"
+LOCALHOST = '127.0.0.1'
+PARAM_SPECIFIER = ':'
 
 class HostHandler():
     """
@@ -88,6 +89,15 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             self.data = json.load(f)
             self.routes = list(self.data.keys())
 
+    def _process_route(self, route):
+        path = None
+        param = None
+        try:
+            path, param = route.split(PARAM_SPECIFIER)
+        except:
+            path = route
+        return path, param
+
     def _API_response(self, code):
         """
         Perpare the api response
@@ -111,6 +121,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         self._build_router()
         valid_path = False
         for endpoint in self.routes:
+            endpoint_path, param = self._process_route(endpoint)
             if self.path.endswith("/" + endpoint):
                     valid_path = True
                     self._set_headers()
