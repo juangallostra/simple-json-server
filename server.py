@@ -96,7 +96,13 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             path, param = route.split(PARAM_SPECIFIER)
         except:
             path = route
-        return path, param
+        return path.rstrip('/'), param
+
+    def _get_data_key(self, path, param):
+        if param is not None:
+            return path + '/' + PARAM_SPECIFIER + param
+        return path
+        
 
     def _API_response(self, code):
         """
@@ -119,16 +125,31 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         Handle GET requests
         """
         self._build_router()
-        valid_path = False
         for endpoint in self.routes:
             endpoint_path, param = self._process_route(endpoint)
-            if self.path.endswith("/" + endpoint):
-                    valid_path = True
+            # if the endpoint being tested is not part of the request url
+            # there's no need for further processing
+            if endpoint_path not in self.path:
+                continue
+            # if there is no parameter return all the data
+            if self.path.endswith("/" + endpoint_path): 
                     self._set_headers()
-                    self.wfile.write(bytes(json.dumps(self.data[endpoint]), "utf-8"))
-        if not valid_path:
-            self._set_headers(404)
-            self.wfile.write(bytes(json.dumps(self._API_response(404)), "utf-8"))
+                    self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), "utf-8"))
+                    return
+            # else a parameter value has been included in the request
+            path_val, param_val = self.path.rsplit('/', 1)
+            # try to get value
+            data_to_send = [i for i in self.data[self._get_data_key(endpoint_path, param)] if str(i[param]) == str(param_val)]
+            if len(data_to_send) == 0:
+                continue
+            if len(data_to_send) == 1:
+                data_to_send = data_to_send[0]
+            self._set_headers()
+            self.wfile.write(bytes(json.dumps(data_to_send), "utf-8"))
+            return
+        # Nothing matched the request
+        self._set_headers(404)
+        self.wfile.write(bytes(json.dumps(self._API_response(404)), "utf-8"))
         
     def do_POST(self):
         """
