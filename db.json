@@ -1,24 +1,24 @@
 {
-  "api/metadata": {
-    "info": "Provides customer info",
-    "version":"0.1"
-  },
-  "api/customers": {
+  "api/metadata": { "info": "Provides customer info", "version": "0.1" },
+  "api/customers/:id": {
     "data": [
       {
+        "id":1,
         "name": "Alex Honnold",
-        "email":"ahonnold@climber.com",
+        "email": "ahonnold@climber.com",
         "address": "his van"
       },
       {
-        "name":"Adam Ondra",
-        "email":"aondra@sport-climber.com",
-        "address":"always traveling"
+        "id":2,
+        "name": "Adam Ondra",
+        "email": "aondra@sport-climber.com",
+        "address": "always traveling"
       },
       {
-        "name":"Jimmy Webb",
-        "email":"jwebb@boulderer.com",
-        "address":"Looking for nice boulders"
+        "id": 3,
+        "name": "Jimmy Webb",
+        "email": "jwebb@boulderer.com",
+        "address": "Looking for nice boulders"
       }
     ]
   }
