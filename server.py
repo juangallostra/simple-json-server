@@ -64,12 +64,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
     function specific to the request type (<command>).  Specifically,
     a request SPAM will be handled by a method do_SPAM().  If no
     such method exists the server sends an error response to the
-    client.  If it exists, it is called with no arguments:
-
-    do_SPAM()
-
-    Note that the request name is case sensitive (i.e. SPAM and spam
-    are different requests).
+    client.  If it exists, it is called with no arguments.
     """
     db = None # file from which to extract data and routing
     
