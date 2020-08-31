@@ -1,5 +1,20 @@
 {
-  "api/metadata": { "info": "Provides customer info", "version": "0.1" },
+  "api/metadata": { 
+    "info": "Provides customer and product info",
+    "version": "0.1",
+    "endpoints": [
+      {
+        "route": "/api/customers",
+        "params": "id",
+        "description": "Get customers"
+      },
+      {
+        "route": "/api/products",
+        "params": "normalized_name",
+        "description": "Get products"
+      }
+    ] 
+  },
   "api/customers/:id": [
     {
       "id": 1,
