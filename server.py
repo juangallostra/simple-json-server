@@ -89,7 +89,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             self.data = json.load(f)
             self.routes = list(self.data.keys())
 
-    def _process_route(self, route):
+    def _get_route_and_params(self, route):
         path = None
         param = None
         try:
@@ -126,7 +126,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         """
         self._build_router()
         for endpoint in self.routes:
-            endpoint_path, param = self._process_route(endpoint)
+            endpoint_path, param = self._get_route_and_params(endpoint)
             # if the endpoint being tested is not part of the request url
             # there's no need for further processing
             if endpoint_path not in self.path:
