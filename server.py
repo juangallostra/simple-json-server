@@ -197,7 +197,6 @@ def run(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, f
     """
     Run the server forever listening at the specified port
     """
-    # TODO: Simplify logic
     log_url = url if url else 'localhost'
     log_port = ':{}/'.format(port) if port!=80 else '/' 
     log_msg = "\nRunning at http://{}{}".format(log_url, log_port)
