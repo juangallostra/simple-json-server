@@ -176,13 +176,6 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             self._set_headers(404)
             self.wfile.write(bytes(json.dumps(self._API_response(404)), "utf-8"))
 
-    def do_HEAD(self):
-        """
-        Set response headers
-        """
-        self._set_headers()
-
-
 class SimpleServer(HTTPServer):
     """
     Class used to set the data file from 
