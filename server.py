@@ -90,6 +90,8 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             self.routes = list(self.data.keys())
 
     def _get_route_and_params(self, route):
+        """
+        """
         path = None
         param = None
         try:
@@ -99,10 +101,16 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         return path.rstrip('/'), param
 
     def _get_data_key(self, path, param):
+        """
+        """
         if param is not None:
             return path + '/' + PARAM_SPECIFIER + param
         return path
         
+    def _generate_next_id(self, current_data):
+        """
+        """
+        return max([e['id'] for e in current_data]) + 1
 
     def _API_response(self, code):
         """
@@ -158,15 +166,22 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         self._build_router()
         valid_path = False
         for endpoint in self.routes:
-            if self.path.endswith("/" + endpoint):
+            endpoint_path, param = self._get_route_and_params(endpoint)
+            if self.path.endswith("/" + endpoint_path):
                     valid_path = True
                     status_code = 200
                     # read post data
-                    post_data = self.rfile.read(int(self.headers.get('Content-Length'))).decode("UTF-8")
+                    post_data = json.loads(self.rfile.read(int(self.headers.get('Content-Length'))).decode("UTF-8"))
                     try:
-                        self.data[endpoint] = json.loads(post_data)
-                        with open(self.db, "w") as f:
-                            f.write(json.dumps(self.data))
+                        current_data = self.data[self._get_data_key(endpoint, None)]
+                        if type(current_data) == list and type(post_data) == dict:
+                            # Add object to list
+                            post_data['id'] = self._generate_next_id(current_data)
+                            self.data[endpoint] = current_data + [post_data]
+                            with open(self.db, "w") as f:
+                                f.write(json.dumps(self.data))
+                        else:
+                            status_code = 400
                     except:
                         status_code = 400
                     self._set_headers(status_code)
