@@ -145,7 +145,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                     self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), "utf-8"))
                     return
             # else a parameter value has been included in the request
-            path_val, param_val = self.path.rsplit('/', 1)
+            _, param_val = self.path.rsplit('/', 1)
             # try to get value
             data_to_send = [i for i in self.data[self._get_data_key(endpoint_path, param)] if str(i[param]) == str(param_val)]
             if len(data_to_send) == 0:
@@ -166,7 +166,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         self._build_router()
         valid_path = False
         for endpoint in self.routes:
-            endpoint_path, param = self._get_route_and_params(endpoint)
+            endpoint_path, _ = self._get_route_and_params(endpoint)
             if self.path.endswith("/" + endpoint_path):
                     valid_path = True
                     status_code = 200
