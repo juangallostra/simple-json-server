@@ -1,25 +1,65 @@
 {
-  "api/metadata": { "info": "Provides customer info", "version": "0.1" },
-  "api/customers/:id": {
-    "data": [
+  "api/metadata": { 
+    "info": "Provides customer and product info",
+    "version": "0.1",
+    "endpoints": [
       {
-        "id":1,
-        "name": "Alex Honnold",
-        "email": "ahonnold@climber.com",
-        "address": "his van"
+        "route": "/api/customers",
+        "params": "id",
+        "description": "Get customers"
       },
       {
-        "id":2,
-        "name": "Adam Ondra",
-        "email": "aondra@sport-climber.com",
-        "address": "always traveling"
-      },
-      {
-        "id": 3,
-        "name": "Jimmy Webb",
-        "email": "jwebb@boulderer.com",
-        "address": "Looking for nice boulders"
+        "route": "/api/products",
+        "params": "normalized_name",
+        "description": "Get products"
       }
-    ]
-  }
+    ] 
+  },
+  "api/customers/:id": [
+    {
+      "id": 1,
+      "name": "Alex Honnold",
+      "email": "ahonnold@climber.com",
+      "address": "his van"
+    },
+    {
+      "id": 2,
+      "name": "Adam Ondra",
+      "email": "aondra@sport-climber.com",
+      "address": "always traveling"
+    },
+    {
+      "id": 3,
+      "name": "Jimmy Webb",
+      "email": "jwebb@boulderer.com",
+      "address": "Looking for nice boulders"
+    }
+  ],
+  "api/products/:normalized_name":
+  [
+    {
+      "id": 1,
+      "normalized_name": "miura_vs",
+      "name":"La Sportiva Miura VS",
+      "price":"130"
+    },
+    {
+      "id": 2,
+      "normalized_name": "solution_comp",
+      "name": "La Sportiva Solution Comp",
+      "price": "140"
+    },
+    {
+      "id": 3,
+      "normalized_name": "hiangle",
+      "name": "Five Ten Hiangle",
+      "price":"120"
+    },
+    {
+      "id": 4,
+      "normalized_name": "instinct",
+      "name": "Scarpa Instinct",
+      "price":"135"
+    }
+  ]
 }

@@ -10,7 +10,8 @@ import datetime
 import socket
 import struct
 
-LOCALHOST = "127.0.0.1"
+LOCALHOST = '127.0.0.1'
+PARAM_SPECIFIER = ':'
 
 class HostHandler():
     """
@@ -88,6 +89,29 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             self.data = json.load(f)
             self.routes = list(self.data.keys())
 
+    def _get_route_and_params(self, route):
+        """
+        """
+        path = None
+        param = None
+        try:
+            path, param = route.split(PARAM_SPECIFIER)
+        except:
+            path = route
+        return path.rstrip('/'), param
+
+    def _get_data_key(self, path, param):
+        """
+        """
+        if param is not None:
+            return path + '/' + PARAM_SPECIFIER + param
+        return path
+        
+    def _generate_next_id(self, current_data):
+        """
+        """
+        return max([e['id'] for e in current_data]) + 1
+
     def _API_response(self, code):
         """
         Perpare the api response
@@ -109,15 +133,31 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         Handle GET requests
         """
         self._build_router()
-        valid_path = False
         for endpoint in self.routes:
-            if self.path.endswith("/" + endpoint):
-                    valid_path = True
+            endpoint_path, param = self._get_route_and_params(endpoint)
+            # if the endpoint being tested is not part of the request url
+            # there's no need for further processing
+            if endpoint_path not in self.path:
+                continue
+            # if there is no parameter return all the data
+            if self.path.endswith("/" + endpoint_path): 
                     self._set_headers()
-                    self.wfile.write(bytes(json.dumps(self.data[endpoint]), "utf-8"))
-        if not valid_path:
-            self._set_headers(404)
-            self.wfile.write(bytes(json.dumps(self._API_response(404)), "utf-8"))
+                    self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), "utf-8"))
+                    return
+            # else a parameter value has been included in the request
+            path_val, param_val = self.path.rsplit('/', 1)
+            # try to get value
+            data_to_send = [i for i in self.data[self._get_data_key(endpoint_path, param)] if str(i[param]) == str(param_val)]
+            if len(data_to_send) == 0:
+                continue
+            if len(data_to_send) == 1:
+                data_to_send = data_to_send[0]
+            self._set_headers()
+            self.wfile.write(bytes(json.dumps(data_to_send), "utf-8"))
+            return
+        # Nothing matched the request
+        self._set_headers(404)
+        self.wfile.write(bytes(json.dumps(self._API_response(404)), "utf-8"))
         
     def do_POST(self):
         """
@@ -126,15 +166,22 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         self._build_router()
         valid_path = False
         for endpoint in self.routes:
-            if self.path.endswith("/" + endpoint):
+            endpoint_path, param = self._get_route_and_params(endpoint)
+            if self.path.endswith("/" + endpoint_path):
                     valid_path = True
                     status_code = 200
                     # read post data
-                    post_data = self.rfile.read(int(self.headers.get('Content-Length'))).decode("UTF-8")
+                    post_data = json.loads(self.rfile.read(int(self.headers.get('Content-Length'))).decode("UTF-8"))
                     try:
-                        self.data[endpoint] = json.loads(post_data)
-                        with open(self.db, "w") as f:
-                            f.write(json.dumps(self.data))
+                        current_data = self.data[self._get_data_key(endpoint, None)]
+                        if type(current_data) == list and type(post_data) == dict:
+                            # Add object to list
+                            post_data['id'] = self._generate_next_id(current_data)
+                            self.data[endpoint] = current_data + [post_data]
+                            with open(self.db, "w") as f:
+                                f.write(json.dumps(self.data))
+                        else:
+                            status_code = 400
                     except:
                         status_code = 400
                     self._set_headers(status_code)
@@ -143,13 +190,6 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         if not valid_path:
             self._set_headers(404)
             self.wfile.write(bytes(json.dumps(self._API_response(404)), "utf-8"))
-
-    def do_HEAD(self):
-        """
-        Set response headers
-        """
-        self._set_headers()
-
 
 class SimpleServer(HTTPServer):
     """
@@ -165,7 +205,6 @@ def run(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, f
     """
     Run the server forever listening at the specified port
     """
-    # TODO: Simplify logic
     log_url = url if url else 'localhost'
     log_port = ':{}/'.format(port) if port!=80 else '/' 
     log_msg = "\nRunning at http://{}{}".format(log_url, log_port)
