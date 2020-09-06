@@ -112,6 +112,22 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         """
         return max([e['id'] for e in current_data]) + 1
 
+    def _validate_request(self, param, post_data, current_data):
+        """
+        """
+        if type(current_data) != list or type(post_data) != dict:
+            return 400
+        # there is no parameter, no problem
+        if not param or param == 'id': 
+            return 200
+        # There is a parameter
+        if not post_data.get(param, ''): # Check if post body contains the parameter
+            return 400
+        # There is a parameter and the body contains the parameter
+        if post_data.get(param, '') in [i[param] for i in current_data]: # check that the value isn't repeated
+            return 409
+        return 200
+
     def _API_response(self, code):
         """
         Perpare the api response
@@ -166,7 +182,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         self._build_router()
         valid_path = False
         for endpoint in self.routes:
-            endpoint_path, _ = self._get_route_and_params(endpoint)
+            endpoint_path, param = self._get_route_and_params(endpoint)
             if self.path.endswith("/" + endpoint_path):
                     valid_path = True
                     status_code = 200
@@ -174,14 +190,16 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                     post_data = json.loads(self.rfile.read(int(self.headers.get('Content-Length'))).decode("UTF-8"))
                     try:
                         current_data = self.data[self._get_data_key(endpoint, None)]
-                        if type(current_data) == list and type(post_data) == dict:
-                            # Add object to list
-                            post_data['id'] = self._generate_next_id(current_data)
-                            self.data[endpoint] = current_data + [post_data]
-                            with open(self.db, "w") as f:
-                                f.write(json.dumps(self.data))
-                        else:
-                            status_code = 400
+                        status_code = self._validate_request(param, post_data, current_data)
+                        if status_code != 200:
+                            self._set_headers(status_code)
+                            self.wfile.write(bytes(json.dumps(self._API_response(status_code)), "utf-8"))
+                            return
+                        # If valid, add object to list
+                        post_data['id'] = self._generate_next_id(current_data)
+                        self.data[endpoint] = current_data + [post_data]
+                        with open(self.db, "w") as f:
+                            f.write(json.dumps(self.data))
                     except:
                         status_code = 400
                     self._set_headers(status_code)
