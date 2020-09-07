@@ -36,7 +36,7 @@ class HostHandler():
 
     def remove_host(self, path=None):
         """
-        Remove this host from hosts file
+        Remove this host from the hosts file
         """
         if path is None:
             path = self.default_path
