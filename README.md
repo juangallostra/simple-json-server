@@ -30,7 +30,7 @@ $ python server.py -u my-fake-website.com -p 5000 -f db.json
 
 ### Routing and data
 
-A single `JSON` file provides both the server endpoints and the data that will be accessed through that endpoint. The file should contain a single `JSON` object. For each name/value pair, the name will be an accessible endpoint and the value the data accessed through that endpoint.
+A single `JSON` file provides both the server endpoints and the data that will be accessed through that endpoint. The file should contain a single `JSON` object. For each name/value pair, the name will be an accessible endpoint and the value the data accessed through that endpoint. All endpoints accept, by default, GET requests. However, only endpoints whose value is a list of objects will accept POST requests.
 
 As an example, if the following was defined inside the `JSON` file:
 
@@ -55,7 +55,36 @@ As an example, if the following was defined inside the `JSON` file:
 }
 ```
 
-Then querying `[...]/api/metadata` will return the value associated with the name.
+Then querying `[...]/api/metadata` will return the value associated with the name. It is also possible to specify a list of objects as the data to be returned instead of a single object. **The endpoints whose value is a list of objects are the only ones that will accept and process POST requests**. For example:
+
+```JSON
+{
+  "api/customers": [
+    {
+      "id": 1,
+      "name": "Alex Honnold",
+      "email": "ahonnold@climber.com",
+      "address": "his van"
+    },
+    {
+      "id": 2,
+      "name": "Adam Ondra",
+      "email": "aondra@sport-climber.com",
+      "address": "always traveling"
+    },
+    {
+      "id": 3,
+      "name": "Jimmy Webb",
+      "email": "jwebb@boulderer.com",
+      "address": "Looking for nice boulders"
+    }
+  ]
+}
+```
+
+Then querying `[...]/api/customers` will return the whole list of customers.
+
+### Parameters
 
 ### Errors and Exceptions
 
@@ -70,7 +99,5 @@ When an error or exception is raised, the server reply will be in the form:
   }
 }
 ```
-
-### Parameters
 
 ### Running Multiple instances
