@@ -4,7 +4,7 @@ Deploy a local JSON server in a matter of seconds from a JSON file with data and
 
 This project was inspired by [tipycode's json-server](https://github.com/typicode/json-server).
 
-It currently only supports `GET` and `POST` methods.
+It currently supports only `GET` and `POST` methods.
 
 ## Usage
 
