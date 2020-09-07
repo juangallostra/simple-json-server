@@ -11,6 +11,7 @@ import socket
 import struct
 
 LOCALHOST = '127.0.0.1'
+DEFAULT_ENCODING = 'utf-8'
 PARAM_SPECIFIER = ':'
 
 class HostHandler():
@@ -165,7 +166,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             # if there is no parameter return all the data
             if self.path.endswith("/" + endpoint_path): 
                     self._set_headers()
-                    self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), "utf-8"))
+                    self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), DEFAULT_ENCODING))
                     return
             # else a parameter value has been included in the request
             _, param_val = self.path.rsplit('/', 1)
@@ -176,11 +177,11 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             if len(data_to_send) == 1:
                 data_to_send = data_to_send[0]
             self._set_headers()
-            self.wfile.write(bytes(json.dumps(data_to_send), "utf-8"))
+            self.wfile.write(bytes(json.dumps(data_to_send), DEFAULT_ENCODING))
             return
         # Nothing matched the request
         self._set_headers(404)
-        self.wfile.write(bytes(json.dumps(self._API_response(404)), "utf-8"))
+        self.wfile.write(bytes(json.dumps(self._API_response(404)), DEFAULT_ENCODING))
         
     def do_POST(self):
         """
@@ -200,7 +201,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                         status_code = self._validate_request(param, post_data, current_data)
                         if status_code != 200:
                             self._set_headers(status_code)
-                            self.wfile.write(bytes(json.dumps(self._API_response(status_code)), "utf-8"))
+                            self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
                             return
                         # If valid, add object to list
                         post_data['id'] = self._generate_next_id(current_data)
@@ -210,11 +211,11 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                     except:
                         status_code = 400
                     self._set_headers(status_code)
-                    self.wfile.write(bytes(json.dumps(self._API_response(status_code)), "utf-8"))
+                    self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
 
         if not valid_path:
             self._set_headers(404)
-            self.wfile.write(bytes(json.dumps(self._API_response(404)), "utf-8"))
+            self.wfile.write(bytes(json.dumps(self._API_response(404)), DEFAULT_ENCODING))
 
 class SimpleServer(HTTPServer):
     """
