@@ -4,6 +4,8 @@ Deploy a local JSON server in a matter of seconds from a JSON file with data and
 
 This project was inspired by [tipycode's json-server](https://github.com/typicode/json-server).
 
+It currently only supports `GET` and `POST` methods.
+
 ## Usage
 
 ```
@@ -24,5 +26,40 @@ To specify a hostname, port and JSON file from where to extract data and endpoin
 $ python server.py -u my-fake-website.com -p 5000 -f db.json
 ```
 
-### Running Multiple instances
+## Configuration
 
+### Routing and data
+
+A single `JSON` file provides both the server endpoints and the data that will be accessed through that endpoint. The file should contain a single `JSON` object. For each name/value pair, the name will be an accessible endpoint and the value the data accessed through that endpoint.
+
+As an example, if the following was defined inside the `JSON` file:
+
+```JSON
+{
+  [...],
+  "/api/metadata": {
+    "info": "Provides customer and product info",
+    "version": "0.1",
+    "endpoints": [
+      {
+        "route": "/api/customers",
+        "params": "id",
+        "description": "Get customers"
+      },
+      {
+        "route": "/api/products",
+        "params": "normalized_name",
+        "description": "Get products"
+      }
+    ]
+  },
+  [...]
+}
+```
+
+Then querying `[...]/api/metadata` would return the value associated with the name.
+
+### Parameters
+
+
+### Running Multiple instances
