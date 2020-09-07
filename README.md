@@ -55,7 +55,21 @@ As an example, if the following was defined inside the `JSON` file:
 }
 ```
 
-Then querying `[...]/api/metadata` would return the value associated with the name. 
+Then querying `[...]/api/metadata` will return the value associated with the name.
+
+### Errors and Exceptions
+
+When an error or exception is raised, the server reply will be in the form:
+
+```JSON
+{
+  "result": {
+    "code": "ERROR_CODE",
+    "message": "ERROR_MESSAGE",
+    "description": "ERROR_DESCRIPTION"
+  }
+}
+```
 
 ### Parameters
 
