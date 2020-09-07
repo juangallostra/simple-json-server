@@ -25,8 +25,10 @@ As stated above, the default values are `80` for the port, `localhost` for the h
 To specify a hostname, port and JSON file from where to extract data and endpoints:
 
 ```sh
-$ python server.py -u my-fake-website.com -p 5000 -f db.json
+$ python server.py -u climbers-climbers.com -p 5000 -f db.json
 ```
+
+Assuming [this file](https://github.com/juangallostra/simple-json-server/blob/master/db.json) is the one used for configuring the server:
 
 ## Configuration
 
