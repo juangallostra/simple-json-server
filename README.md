@@ -18,6 +18,8 @@ optional arguments:
   -u URL, --url URL     Set a fake url for the server, defaults to localhost
 ```
 
+As stated above, the default values are `80` for the port, `localhost` for the hostname and `db.json` as the configuration file.
+
 ### Examples
 
 To specify a hostname, port and JSON file from where to extract data and endpoints:
