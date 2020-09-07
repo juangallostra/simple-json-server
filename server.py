@@ -137,7 +137,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
 
     def _API_response(self, code):
         """
-        Perpare the api response
+        Perpare the API response
         """
         resp = [status_code for status_code in HTTPStatus if status_code.value == code]
         if len(resp) == 1:
@@ -235,10 +235,12 @@ def run(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, f
     log_msg = "\nRunning at http://{}{}".format(log_url, log_port)
     server_address = ('', int(port))
     httpd = server_class(server_address, handler_class, file)
+
     print('Starting Server...')
     print('Listening to connections on port: ' + str(port))
     print('Routing and data will be extracted from: ' + file)
     print(log_msg)
+    
     httpd.serve_forever()
 
 def parse_args():
@@ -249,6 +251,7 @@ def parse_args():
     parser.add_argument('-p', '--port', help='Specify the desired port')
     parser.add_argument('-f', '--file', help='File from which to extract routing and data')
     parser.add_argument('-u', '--url', help='Set a fake url for the server')
+    
     return dict({k: v for k, v in vars(parser.parse_args()).items() if v is not None})
 
 if __name__ == "__main__":
