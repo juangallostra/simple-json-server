@@ -32,6 +32,8 @@ $ python server.py -u my-fake-website.com -p 5000 -f db.json
 
 A single `JSON` file provides both the server endpoints and the data that will be accessed through that endpoint. The file should contain a single `JSON` object. For each name/value pair, the name will be an accessible endpoint and the value the data accessed through that endpoint. All endpoints accept, by default, GET requests. However, only endpoints whose value is a list of objects will accept POST requests.
 
+A full example of a configuration file can be found [here](https://github.com/juangallostra/simple-json-server/blob/master/db.json).
+
 As an example, if the following was defined inside the `JSON` file:
 
 ```JSON
