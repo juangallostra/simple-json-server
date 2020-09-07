@@ -60,10 +60,10 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
     From the documentation of BaseHTTPRequestHandler:
 
     This server parses the request and the headers, and then calls a
-    function specific to the request type (<command>).  Specifically,
-    a request SPAM will be handled by a method do_SPAM().  If no
+    function specific to the request type (<command>). Specifically,
+    a request SPAM will be handled by a method do_SPAM(). If no
     such method exists the server sends an error response to the
-    client.  If it exists, it is called with no arguments.
+    client. If it exists, it is called with no arguments.
     """
     db = None # file from which to extract data and routing
     
@@ -90,7 +90,8 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
     def _get_route_and_params(self, route):
         """
         Split a generic route into the path 
-        and the parameter
+        and the parameter. If there is no parameter,
+        its value is set to None
         """
         path = None
         param = None
