@@ -136,5 +136,3 @@ When an error or exception is raised, the server reply will be in the form:
   }
 }
 ```
-
-### Running Multiple instances
