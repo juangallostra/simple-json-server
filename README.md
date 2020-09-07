@@ -92,7 +92,9 @@ Then querying `[...]/api/customers` will return the whole list of customers.
 
 ### Parameters
 
-For the routes that return a list of objects it is possible to specify a parameter in the configuration file. To do so, `[...]/path/to/endpoint/:param`. When the parameter value is set, only those objects that match the parameter value will be returned. 
+For the routes that return a list of objects it is possible to specify a parameter in the configuration file. To do so, the format of the route in the configuration file should be: `[...]/path/to/endpoint/:PARAM_NAME`. `PARAM_NAME` should match a property of the stored objects. When the parameter value is set, only the objects whose value matches the specified parameter value will be returned. If no parameter value is set, the complete list of objects will be returned.
+
+As an example, let's say the following has been defined in the configuration file:
 
 ```JSON
 {
@@ -119,7 +121,7 @@ For the routes that return a list of objects it is possible to specify a paramet
 }
 ```
 
-`[...]/api/customers` will return the full list of objects while `[...]/api/customers/2` will return the customer whose `id` is 2.
+Then `[...]/api/customers` will return the full list of objects while `[...]/api/customers/2` will return the customer whose `id` is 2.
 
 ### Errors and Exceptions
 
