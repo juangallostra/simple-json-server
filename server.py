@@ -249,9 +249,9 @@ def parse_args():
     Process command line arguments and return them as a dict
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--port', help='Specify the desired port')
-    parser.add_argument('-f', '--file', help='File from which to extract routing and data')
-    parser.add_argument('-u', '--url', help='Set a fake url for the server')
+    parser.add_argument('-p', '--port', help='Specify the desired port, defaults to port 80')
+    parser.add_argument('-f', '--file', help='File from which to extract routing and data, defaults to db.json')
+    parser.add_argument('-u', '--url', help='Set a fake url for the server, defaults to localhost')
     
     return dict({k: v for k, v in vars(parser.parse_args()).items() if v is not None})
 

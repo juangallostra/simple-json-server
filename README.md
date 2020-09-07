@@ -13,9 +13,9 @@ usage: server.py [-h] [-p PORT] [-f FILE] [-u URL]
 
 optional arguments:
   -h, --help            show this help message and exit
-  -p PORT, --port PORT  Specify the desired port
-  -f FILE, --file FILE  File from which to extract routing and data
-  -u URL, --url URL     Set a fake url for the server
+  -p PORT, --port PORT  Specify the desired port, defaults to port 80
+  -f FILE, --file FILE  File from which to extract routing and data, defaults to db.json
+  -u URL, --url URL     Set a fake url for the server, defaults to localhost
 ```
 
 ### Examples
