@@ -36,7 +36,6 @@ As an example, if the following was defined inside the `JSON` file:
 
 ```JSON
 {
-  [...],
   "/api/metadata": {
     "info": "Provides customer and product info",
     "version": "0.1",
@@ -52,14 +51,12 @@ As an example, if the following was defined inside the `JSON` file:
         "description": "Get products"
       }
     ]
-  },
-  [...]
+  }
 }
 ```
 
-Then querying `[...]/api/metadata` would return the value associated with the name.
+Then querying `[...]/api/metadata` would return the value associated with the name. 
 
 ### Parameters
-
 
 ### Running Multiple instances
