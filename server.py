@@ -6,9 +6,6 @@ import json
 import argparse
 import re
 import os
-import datetime
-import socket
-import struct
 
 LOCALHOST = '127.0.0.1'
 DEFAULT_ENCODING = 'utf-8'
