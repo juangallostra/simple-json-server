@@ -92,6 +92,35 @@ Then querying `[...]/api/customers` will return the whole list of customers.
 
 ### Parameters
 
+For the routes that return a list of objects it is possible to specify a parameter in the configuration file. To do so, `[...]/path/to/endpoint/:param`. When the parameter value is set, only those objects that match the parameter value will be returned. 
+
+```JSON
+{
+  "api/customers/:id": [
+    {
+      "id": 1,
+      "name": "Alex Honnold",
+      "email": "ahonnold@climber.com",
+      "address": "his van"
+    },
+    {
+      "id": 2,
+      "name": "Adam Ondra",
+      "email": "aondra@sport-climber.com",
+      "address": "always traveling"
+    },
+    {
+      "id": 3,
+      "name": "Jimmy Webb",
+      "email": "jwebb@boulderer.com",
+      "address": "Looking for nice boulders"
+    }
+  ]
+}
+```
+
+`[...]/api/customers` will return the full list of objects while `[...]/api/customers/2` will return the customer whose `id` is 2.
+
 ### Errors and Exceptions
 
 When an error or exception is raised, the server reply will be in the form:
