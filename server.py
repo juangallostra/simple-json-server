@@ -91,6 +91,8 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
 
     def _get_route_and_params(self, route):
         """
+        Split a generic route into the path 
+        and the parameter
         """
         path = None
         param = None
@@ -102,6 +104,8 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
 
     def _get_data_key(self, path, param):
         """
+        Get the key from which to access a specific set of data
+        from the database
         """
         if param is not None:
             return path + '/' + PARAM_SPECIFIER + param
@@ -109,11 +113,14 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         
     def _generate_next_id(self, current_data):
         """
+        Generate the next ID from the current list of
+        items in the database
         """
         return max([e['id'] for e in current_data]) + 1
 
     def _validate_request(self, param, post_data, current_data):
         """
+        Validate the body of a POST request.
         """
         if type(current_data) != list or type(post_data) != dict:
             return 400
