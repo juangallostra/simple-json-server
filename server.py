@@ -258,4 +258,3 @@ if __name__ == "__main__":
         # gracefully end program and removing entries from hosts files
         if args.get('url', ''):
             host.remove_host()
-
