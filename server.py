@@ -6,11 +6,9 @@ import json
 import argparse
 import re
 import os
-import datetime
-import socket
-import struct
 
 LOCALHOST = '127.0.0.1'
+DEFAULT_ENCODING = 'utf-8'
 PARAM_SPECIFIER = ':'
 
 class HostHandler():
@@ -38,7 +36,7 @@ class HostHandler():
 
     def remove_host(self, path=None):
         """
-        Remove this host from hosts file
+        Remove this host from the hosts file
         """
         if path is None:
             path = self.default_path
@@ -62,10 +60,10 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
     From the documentation of BaseHTTPRequestHandler:
 
     This server parses the request and the headers, and then calls a
-    function specific to the request type (<command>).  Specifically,
-    a request SPAM will be handled by a method do_SPAM().  If no
+    function specific to the request type (<command>). Specifically,
+    a request SPAM will be handled by a method do_SPAM(). If no
     such method exists the server sends an error response to the
-    client.  If it exists, it is called with no arguments.
+    client. If it exists, it is called with no arguments.
     """
     db = None # file from which to extract data and routing
     
@@ -91,6 +89,9 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
 
     def _get_route_and_params(self, route):
         """
+        Split a generic route into the path 
+        and the parameter. If there is no parameter,
+        its value is set to None
         """
         path = None
         param = None
@@ -102,6 +103,8 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
 
     def _get_data_key(self, path, param):
         """
+        Get the key from which to access a specific set of data
+        from the database
         """
         if param is not None:
             return path + '/' + PARAM_SPECIFIER + param
@@ -109,11 +112,14 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         
     def _generate_next_id(self, current_data):
         """
+        Generate the next ID from the current list of
+        items in the database
         """
         return max([e['id'] for e in current_data]) + 1
 
     def _validate_request(self, param, post_data, current_data):
         """
+        Validate the body of a POST request.
         """
         if type(current_data) != list or type(post_data) != dict:
             return 400
@@ -130,7 +136,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
 
     def _API_response(self, code):
         """
-        Perpare the api response
+        Perpare the API response
         """
         resp = [status_code for status_code in HTTPStatus if status_code.value == code]
         if len(resp) == 1:
@@ -158,7 +164,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             # if there is no parameter return all the data
             if self.path.endswith("/" + endpoint_path): 
                     self._set_headers()
-                    self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), "utf-8"))
+                    self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), DEFAULT_ENCODING))
                     return
             # else a parameter value has been included in the request
             _, param_val = self.path.rsplit('/', 1)
@@ -169,11 +175,11 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             if len(data_to_send) == 1:
                 data_to_send = data_to_send[0]
             self._set_headers()
-            self.wfile.write(bytes(json.dumps(data_to_send), "utf-8"))
+            self.wfile.write(bytes(json.dumps(data_to_send), DEFAULT_ENCODING))
             return
         # Nothing matched the request
         self._set_headers(404)
-        self.wfile.write(bytes(json.dumps(self._API_response(404)), "utf-8"))
+        self.wfile.write(bytes(json.dumps(self._API_response(404)), DEFAULT_ENCODING))
         
     def do_POST(self):
         """
@@ -193,7 +199,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                         status_code = self._validate_request(param, post_data, current_data)
                         if status_code != 200:
                             self._set_headers(status_code)
-                            self.wfile.write(bytes(json.dumps(self._API_response(status_code)), "utf-8"))
+                            self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
                             return
                         # If valid, add object to list
                         post_data['id'] = self._generate_next_id(current_data)
@@ -203,11 +209,11 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                     except:
                         status_code = 400
                     self._set_headers(status_code)
-                    self.wfile.write(bytes(json.dumps(self._API_response(status_code)), "utf-8"))
+                    self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
 
         if not valid_path:
             self._set_headers(404)
-            self.wfile.write(bytes(json.dumps(self._API_response(404)), "utf-8"))
+            self.wfile.write(bytes(json.dumps(self._API_response(404)), DEFAULT_ENCODING))
 
 class SimpleServer(HTTPServer):
     """
@@ -228,10 +234,12 @@ def run(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, f
     log_msg = "\nRunning at http://{}{}".format(log_url, log_port)
     server_address = ('', int(port))
     httpd = server_class(server_address, handler_class, file)
+
     print('Starting Server...')
     print('Listening to connections on port: ' + str(port))
     print('Routing and data will be extracted from: ' + file)
     print(log_msg)
+    
     httpd.serve_forever()
 
 def parse_args():
@@ -239,9 +247,10 @@ def parse_args():
     Process command line arguments and return them as a dict
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--port', help='Specify the desired port')
-    parser.add_argument('-f', '--file', help='File from which to extract routing and data')
-    parser.add_argument('-u', '--url', help='Set a fake url for the server')
+    parser.add_argument('-p', '--port', help='Specify the desired port, defaults to port 80')
+    parser.add_argument('-f', '--file', help='File from which to extract routing and data, defaults to db.json')
+    parser.add_argument('-u', '--url', help='Set a fake url for the server, defaults to localhost')
+    
     return dict({k: v for k, v in vars(parser.parse_args()).items() if v is not None})
 
 if __name__ == "__main__":
