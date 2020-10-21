@@ -10,6 +10,9 @@ import os
 LOCALHOST = '127.0.0.1'
 DEFAULT_ENCODING = 'utf-8'
 PARAM_SPECIFIER = ':'
+SEPARATOR = '/'
+URL = 'url'
+ID = 'id'
 
 class HostHandler():
     """
@@ -19,7 +22,7 @@ class HostHandler():
     localhost, so the way to have multiple mock server instances serving different
     content is by specifying a different port.
     """
-    def __init__(self, path_to_hosts=r"C:\Windows\System32\drivers\etc\hosts", address=LOCALHOST, hostname=None):
+    def __init__(self, path_to_hosts=r'C:\Windows\System32\drivers\etc\hosts', address=LOCALHOST, hostname=None):
         self.default_path = path_to_hosts
         self.hostname = hostname
         self.address = address
@@ -83,7 +86,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         # build route handler from datafile
         self.routes = []
         self.data = {}
-        with open(self.db, "r") as f:
+        with open(self.db, 'r') as f:
             self.data = json.load(f)
             self.routes = list(self.data.keys())
 
@@ -99,7 +102,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             path, param = route.split(PARAM_SPECIFIER)
         except:
             path = route
-        return path.rstrip('/'), param
+        return path.rstrip(SEPARATOR), param
 
     def _get_data_key(self, path, param):
         """
@@ -107,7 +110,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         from the database
         """
         if param is not None:
-            return path + '/' + PARAM_SPECIFIER + param
+            return path + SEPARATOR + PARAM_SPECIFIER + param
         return path
         
     def _generate_next_id(self, current_data):
@@ -115,7 +118,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         Generate the next ID from the current list of
         items in the database
         """
-        return max([e['id'] for e in current_data]) + 1
+        return max([e[ID] for e in current_data]) + 1
 
     def _validate_request(self, param, post_data, current_data):
         """
@@ -124,7 +127,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         if type(current_data) != list or type(post_data) != dict:
             return 400
         # there is no parameter, no problem
-        if not param or param == 'id': 
+        if not param or param == ID: 
             return 200
         # There is a parameter
         if not post_data.get(param, ''): # Check if post body contains the parameter
@@ -162,12 +165,12 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             if endpoint_path not in self.path:
                 continue
             # if there is no parameter return all the data
-            if self.path.endswith("/" + endpoint_path): 
+            if self.path.endswith(SEPARATOR + endpoint_path): 
                     self._set_headers()
                     self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), DEFAULT_ENCODING))
                     return
             # else a parameter value has been included in the request
-            _, param_val = self.path.rsplit('/', 1)
+            _, param_val = self.path.rsplit(SEPARATOR, 1)
             # try to get value
             data_to_send = [i for i in self.data[self._get_data_key(endpoint_path, param)] if str(i[param]) == str(param_val)]
             if len(data_to_send) == 0:
@@ -189,7 +192,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         valid_path = False
         for endpoint in self.routes:
             endpoint_path, param = self._get_route_and_params(endpoint)
-            if self.path.endswith("/" + endpoint_path):
+            if self.path.endswith(SEPARATOR + endpoint_path):
                     valid_path = True
                     status_code = 200
                     # read post data
@@ -202,9 +205,9 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                             self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
                             return
                         # If valid, add object to list
-                        post_data['id'] = self._generate_next_id(current_data)
+                        post_data[ID] = self._generate_next_id(current_data)
                         self.data[endpoint] = current_data + [post_data]
-                        with open(self.db, "w") as f:
+                        with open(self.db, 'w') as f:
                             f.write(json.dumps(self.data))
                     except:
                         status_code = 400
@@ -225,13 +228,13 @@ class SimpleServer(HTTPServer):
         super(SimpleServer, self).__init__(server_address, handler_class)
 
 
-def run(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, file="db.json", url=None):
+def run(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, file='db.json', url=None):
     """
     Run the server forever listening at the specified port
     """
     log_url = url if url else 'localhost'
-    log_port = ':{}/'.format(port) if port!=80 else '/' 
-    log_msg = "\nRunning at http://{}{}".format(log_url, log_port)
+    log_port = ':{}/'.format(port) if port!=80 else SEPARATOR 
+    log_msg = '\nRunning at http://{}{}'.format(log_url, log_port)
     server_address = ('', int(port))
     httpd = server_class(server_address, handler_class, file)
 
@@ -255,8 +258,8 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    if args.get('url', ''):
-        host = HostHandler(hostname=args.get('url'))
+    if args.get(URL, ''):
+        host = HostHandler(hostname=args.get(URL))
         host.add_host()
     try:
         if args:
@@ -265,5 +268,5 @@ if __name__ == "__main__":
             run()
     except KeyboardInterrupt:
         # gracefully end program and removing entries from hosts files
-        if args.get('url', ''):
+        if args.get(URL, ''):
             host.remove_host()
