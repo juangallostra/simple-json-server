@@ -152,7 +152,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                 }
             }
 
-    # Handle HTTP requests         
+    # Handle HTTP requests
     def do_GET(self):
         """
         Handle GET requests
