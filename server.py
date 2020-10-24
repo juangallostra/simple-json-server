@@ -69,6 +69,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
     client. If it exists, it is called with no arguments.
     """
     db = None # file from which to extract data and routing
+    routes = []
     
     # Methods for internal use
     def _set_headers(self, status_code=200):
@@ -78,17 +79,6 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         self.send_header('Content-type', 'text/json')
         self.end_headers()
-
-    def _build_router(self):
-        """
-        Get the list of supported routes and its current data
-        """
-        # build route handler from datafile
-        self.routes = []
-        self.data = {}
-        with open(self.db, 'r') as f:
-            self.data = json.load(f)
-            self.routes = list(self.data.keys())
 
     def _get_route_and_params(self, route):
         """
@@ -162,7 +152,6 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         """
         # build map of accessible routes from input file and check
         # if the request path matches any of the endpoints
-        self._build_router()
         for endpoint in self.routes:
             endpoint_path, param = self._get_route_and_params(endpoint)
             # if the endpoint being tested is not part of the request url
@@ -193,7 +182,6 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         """
         Handle POST requests
         """
-        self._build_router()
         valid_path = False
         for endpoint in self.routes:
             endpoint_path, param = self._get_route_and_params(endpoint)
@@ -230,8 +218,26 @@ class SimpleServer(HTTPServer):
     """
     def __init__(self, server_address, handler_class, dbfile):
         SimpleServerHandler.db = dbfile
+        SimpleServerHandler.routes = build_router(dbfile)
+        SimpleServerHandler.data = load_data(dbfile)
         super(SimpleServer, self).__init__(server_address, handler_class)
 
+
+def build_router(dbfile):
+    """
+    Get the list of supported routes and its current data
+    """
+    # build route handler from datafile
+    with open(dbfile, 'r') as f:
+        return list(json.load(f).keys())
+
+def load_data(dbfile):
+    """
+    Get the list of supported routes and its current data
+    """
+    # build route handler from datafile
+    with open(dbfile, 'r') as f:
+        return json.load(f)
 
 def run(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, file='db.json', url=None):
     """
@@ -272,6 +278,6 @@ if __name__ == "__main__":
         else:
             run()
     except KeyboardInterrupt:
-        # gracefully end program and removing entries from hosts files
+        # gracefully end program and remove entries from hosts files
         if args.get(URL, ''):
             host.remove_host()
