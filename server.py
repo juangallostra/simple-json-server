@@ -160,14 +160,16 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         """
         Handle GET requests
         """
+        # build map of accessible routes from input file and check
+        # if the request path matches any of the endpoints
         self._build_router()
         for endpoint in self.routes:
             endpoint_path, param = self._get_route_and_params(endpoint)
             # if the endpoint being tested is not part of the request url
-            # there's no need for further processing
+            # there's no need for further processing, skip to the next one
             if endpoint_path not in self.path:
                 continue
-            # if there is no parameter return all the data
+            # if there is no parameter but an endpoint was matched, return all the data
             if self.path.endswith(SEPARATOR + endpoint_path): 
                     self._set_headers()
                     self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), DEFAULT_ENCODING))
