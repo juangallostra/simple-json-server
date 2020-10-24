@@ -154,26 +154,32 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         # check if the request path matches any of the endpoints
         for endpoint in self.routes:
             endpoint_path, param = self._get_route_and_params(endpoint)
+
             # if the endpoint being tested is not part of the request url
             # there's no need for further processing, skip to the next one
             if endpoint_path not in self.path:
                 continue
+
             # if there is no parameter but an endpoint was matched, return all the data
             if self.path.endswith(SEPARATOR + endpoint_path): 
                     self._set_headers()
                     self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), DEFAULT_ENCODING))
                     return
+
             # else a parameter value has been included in the request
             _, param_val = self.path.rsplit(SEPARATOR, 1)
+
             # try to get value
             data_to_send = [i for i in self.data[self._get_data_key(endpoint_path, param)] if str(i[param]) == str(param_val)]
             if len(data_to_send) == 0:
                 continue
             if len(data_to_send) == 1:
                 data_to_send = data_to_send[0]
+
             self._set_headers()
             self.wfile.write(bytes(json.dumps(data_to_send), DEFAULT_ENCODING))
             return
+
         # Nothing matched the request
         self._set_headers(404)
         self.wfile.write(bytes(json.dumps(self._API_response(404)), DEFAULT_ENCODING))
@@ -184,26 +190,33 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         """
         valid_path = False
         for endpoint in self.routes:
+
             endpoint_path, param = self._get_route_and_params(endpoint)
+            
             if self.path.endswith(SEPARATOR + endpoint_path):
                     valid_path = True
                     status_code = 200
                     # read post data
                     post_data = json.loads(self.rfile.read(int(self.headers.get('Content-Length'))).decode("UTF-8"))
+
                     try:
                         current_data = self.data[self._get_data_key(endpoint, None)]
                         status_code = self._validate_request(param, post_data, current_data)
+
                         if status_code != 200:
                             self._set_headers(status_code)
                             self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
                             return
+
                         # If valid, add object to list
                         post_data[ID] = self._generate_next_id(current_data)
                         self.data[endpoint] = current_data + [post_data]
+
                         with open(self.db, 'w') as f:
                             f.write(json.dumps(self.data))
                     except:
                         status_code = 400
+
                     self._set_headers(status_code)
                     self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
 
@@ -225,7 +238,7 @@ class SimpleServer(HTTPServer):
 
 def build_router(dbfile):
     """
-    Get the list of supported routes and its current data
+    Get the list of supported routes
     """
     # build route handler from datafile
     with open(dbfile, 'r') as f:
@@ -233,7 +246,7 @@ def build_router(dbfile):
 
 def load_data(dbfile):
     """
-    Get the list of supported routes and its current data
+    Get the data from the specified file
     """
     # build route handler from datafile
     with open(dbfile, 'r') as f:
