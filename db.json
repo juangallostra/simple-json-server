@@ -6,12 +6,14 @@
       {
         "route": "/api/customers",
         "params": "id",
-        "description": "Get customers"
+        "description": "Get customers",
+        "methods": ["GET", "POST"]
       },
       {
         "route": "/api/products",
         "params": "normalized_name",
-        "description": "Get products"
+        "description": "Get products",
+        "methods": ["GET", "POST"]
       }
     ] 
   },
