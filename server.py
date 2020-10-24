@@ -150,8 +150,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         """
         Handle GET requests
         """
-        # build map of accessible routes from input file and check
-        # if the request path matches any of the endpoints
+        # check if the request path matches any of the endpoints
         for endpoint in self.routes:
             endpoint_path, param = self._get_route_and_params(endpoint)
             # if the endpoint being tested is not part of the request url
