@@ -116,7 +116,10 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
     def _generate_next_id(self, current_data):
         """
         Generate the next ID from the current list of
-        items in the database
+        items in the database. Overwrite if a different
+        generator is desired. IDs generated here are integers,
+        and the returned value is the current max integer 
+        in the dataset plus 1.
         """
         return max([e[ID] for e in current_data]) + 1
 
