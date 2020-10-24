@@ -68,8 +68,9 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
     such method exists the server sends an error response to the
     client. If it exists, it is called with no arguments.
     """
-    db = None # file from which to extract data and routing
+    db = None # file from which to write the data
     routes = []
+    data = {}
     
     # Methods for internal use
     def _set_headers(self, status_code=200):
