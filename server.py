@@ -282,9 +282,11 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
+
     if args.get(URL, ''):
         host = HostHandler(hostname=args.get(URL))
         host.add_host()
+
     try:
         if args:
             run(**args)
