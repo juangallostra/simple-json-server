@@ -14,6 +14,12 @@ SEPARATOR = '/'
 URL = 'url'
 ID = 'id'
 
+# HTTP status codes
+OK = 200
+BAD_REQUEST = 400
+NOT_FOUND = 404
+CONFLICT = 409
+
 class HostHandler():
     """
     Class that handles the addition of a host definition to the hosts file.
@@ -73,7 +79,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
     data = {}
     
     # Methods for internal use
-    def _set_headers(self, status_code=200):
+    def _set_headers(self, status_code=OK):
         """
         Set response headers. 
         """
@@ -119,17 +125,17 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         Validate the body of a POST request.
         """
         if type(current_data) != list or type(post_data) != dict:
-            return 400
+            return CONFLICT
         # there is no parameter, no problem
         if not param or param == ID: 
-            return 200
+            return OK
         # There is a parameter
         if not post_data.get(param, ''): # Check if post body contains the parameter
-            return 400
+            return BAD_REQUEST
         # There is a parameter and the body contains the parameter
         if post_data.get(param, '') in [i[param] for i in current_data]: # check that the value isn't repeated
-            return 409
-        return 200
+            return CONFLICT
+        return OK
 
     def _API_response(self, code):
         """
@@ -181,8 +187,8 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             return
 
         # Nothing matched the request
-        self._set_headers(404)
-        self.wfile.write(bytes(json.dumps(self._API_response(404)), DEFAULT_ENCODING))
+        self._set_headers(NOT_FOUND)
+        self.wfile.write(bytes(json.dumps(self._API_response(NOT_FOUND)), DEFAULT_ENCODING))
         
     def do_POST(self):
         """
@@ -195,7 +201,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             
             if self.path.endswith(SEPARATOR + endpoint_path):
                     valid_path = True
-                    status_code = 200
+                    status_code = OK
                     # read post data
                     post_data = json.loads(self.rfile.read(int(self.headers.get('Content-Length'))).decode("UTF-8"))
 
@@ -203,7 +209,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                         current_data = self.data[self._get_data_key(endpoint, None)]
                         status_code = self._validate_request(param, post_data, current_data)
 
-                        if status_code != 200:
+                        if status_code != OK:
                             self._set_headers(status_code)
                             self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
                             return
@@ -215,14 +221,14 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                         with open(self.db, 'w') as f:
                             f.write(json.dumps(self.data))
                     except:
-                        status_code = 400
+                        status_code = BAD_REQUEST
 
                     self._set_headers(status_code)
                     self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
 
         if not valid_path:
-            self._set_headers(404)
-            self.wfile.write(bytes(json.dumps(self._API_response(404)), DEFAULT_ENCODING))
+            self._set_headers(NOT_FOUND)
+            self.wfile.write(bytes(json.dumps(self._API_response(NOT_FOUND)), DEFAULT_ENCODING))
 
 class SimpleServer(HTTPServer):
     """
