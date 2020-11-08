@@ -236,9 +236,9 @@ class SimpleServer(HTTPServer):
     which to extract the routing and data
     """
     def __init__(self, server_address, handler_class, dbfile):
-        SimpleServerHandler.db = dbfile
-        SimpleServerHandler.routes = load_routes(dbfile)
-        SimpleServerHandler.data = load_data(dbfile)
+        handler_class.db = dbfile
+        handler_class.routes = load_routes(dbfile)
+        handler_class.data = load_data(dbfile)
         super(SimpleServer, self).__init__(server_address, handler_class)
 
 
