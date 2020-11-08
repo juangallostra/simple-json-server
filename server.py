@@ -203,15 +203,27 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                     valid_path = True
                     status_code = OK
                     # read post data
-                    post_data = json.loads(self.rfile.read(int(self.headers.get('Content-Length'))).decode("UTF-8"))
+                    post_data = json.loads(
+                        self.rfile.read(
+                            int(self.headers.get('Content-Length'))
+                        ).decode("UTF-8"))
 
                     try:
                         current_data = self.data[self._get_data_key(endpoint, None)]
-                        status_code = self._validate_request(param, post_data, current_data)
+                        status_code = self._validate_request(
+                            param,
+                            post_data, 
+                            current_data
+                        )
 
                         if status_code != OK:
                             self._set_headers(status_code)
-                            self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
+                            self.wfile.write(
+                                bytes(
+                                    json.dumps(self._API_response(status_code)), 
+                                    DEFAULT_ENCODING
+                                )
+                                )
                             return
 
                         # If valid, add object to list
@@ -224,11 +236,21 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                         status_code = BAD_REQUEST
 
                     self._set_headers(status_code)
-                    self.wfile.write(bytes(json.dumps(self._API_response(status_code)), DEFAULT_ENCODING))
+                    self.wfile.write(
+                        bytes(
+                            json.dumps(self._API_response(status_code)),
+                            DEFAULT_ENCODING
+                        )
+                    )
 
         if not valid_path:
             self._set_headers(NOT_FOUND)
-            self.wfile.write(bytes(json.dumps(self._API_response(NOT_FOUND)), DEFAULT_ENCODING))
+            self.wfile.write(
+                bytes(
+                    json.dumps(self._API_response(NOT_FOUND)), 
+                    DEFAULT_ENCODING
+                )
+            )
 
 class SimpleServer(HTTPServer):
     """
