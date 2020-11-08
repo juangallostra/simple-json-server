@@ -258,19 +258,19 @@ def load_data(dbfile):
     with open(dbfile, 'r') as f:
         return json.load(f)
 
-def run(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, file='db.json', url=None):
+def run(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, config_file='db.json', url=None):
     """
     Run the server forever listening at the specified port
     """
     log_url = url if url else 'localhost'
-    log_port = ':{}/'.format(port) if port!=80 else SEPARATOR 
-    log_msg = '\nRunning at http://{}{}'.format(log_url, log_port)
+    log_port = f':{port}/' if port!=80 else SEPARATOR 
+    log_msg = f'Running at http://{log_url}{log_port}'
     server_address = ('', int(port))
-    httpd = server_class(server_address, handler_class, file)
+    httpd = server_class(server_address, handler_class, config_file)
 
     print('Starting Server...')
-    print('Listening to connections on port: ' + str(port))
-    print('Routing and data will be extracted from: ' + file)
+    print(f'Listening to connections on port: {port}')
+    print(f'Routing and data will be extracted from: {config_file}')
     print(log_msg)
     
     httpd.serve_forever()
