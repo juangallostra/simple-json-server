@@ -237,12 +237,12 @@ class SimpleServer(HTTPServer):
     """
     def __init__(self, server_address, handler_class, dbfile):
         SimpleServerHandler.db = dbfile
-        SimpleServerHandler.routes = build_router(dbfile)
+        SimpleServerHandler.routes = load_routes(dbfile)
         SimpleServerHandler.data = load_data(dbfile)
         super(SimpleServer, self).__init__(server_address, handler_class)
 
 
-def build_router(dbfile):
+def load_routes(dbfile):
     """
     Get the list of supported routes
     """
