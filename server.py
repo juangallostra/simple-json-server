@@ -258,7 +258,7 @@ def load_data(dbfile):
     with open(dbfile, 'r') as f:
         return json.load(f)
 
-def run(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, config_file='db.json', url=None):
+def run_server(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, config_file='db.json', url=None):
     """
     Run the server forever listening at the specified port
     """
@@ -295,9 +295,9 @@ if __name__ == "__main__":
 
     try:
         if args:
-            run(**args)
+            run_server(**args)
         else:
-            run()
+            run_server()
     except KeyboardInterrupt:
         # gracefully end program and remove entries from hosts files
         if args.get(URL, ''):
