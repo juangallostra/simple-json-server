@@ -254,7 +254,7 @@ def load_data(dbfile):
     """
     Get the data from the specified file
     """
-    # build route handler from datafile
+    # load data from datafile
     with open(dbfile, 'r') as f:
         return json.load(f)
 
