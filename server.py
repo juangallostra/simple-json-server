@@ -259,26 +259,18 @@ class SimpleServer(HTTPServer):
     """
     def __init__(self, server_address, handler_class, dbfile):
         handler_class.db = dbfile
-        handler_class.routes = load_routes(dbfile)
-        handler_class.data = load_data(dbfile)
+        handler_class.routes, handler_class.data = load_routes_and_data(dbfile)
         super(SimpleServer, self).__init__(server_address, handler_class)
 
 
-def load_routes(dbfile):
+def load_routes_and_data(dbfile):
     """
     Get the list of supported routes
     """
     # build route handler from datafile
     with open(dbfile, 'r') as f:
-        return list(json.load(f).keys())
-
-def load_data(dbfile):
-    """
-    Get the data from the specified file
-    """
-    # load data from datafile
-    with open(dbfile, 'r') as f:
-        return json.load(f)
+        data = json.load(f)
+    return list(data.keys()), data
 
 def run_server(server_class=SimpleServer, handler_class=SimpleServerHandler, port=80, config_file='db.json', url=None):
     """
