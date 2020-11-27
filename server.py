@@ -257,10 +257,10 @@ class SimpleServer(HTTPServer):
     Class used to set the data file from 
     which to extract the routing and data
     """
-    def __init__(self, server_address, handler_class, dbfile):
-        handler_class.db = dbfile
-        handler_class.routes, handler_class.data = load_routes_and_data(dbfile)
-        super(SimpleServer, self).__init__(server_address, handler_class)
+    def __init__(self, server_address, handler, dbfile):
+        handler.db = dbfile
+        handler.routes, handler.data = load_routes_and_data(dbfile)
+        super(SimpleServer, self).__init__(server_address, handler)
 
 
 def load_routes_and_data(dbfile):
