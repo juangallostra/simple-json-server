@@ -140,20 +140,23 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             # return CONFLICT
         return OK
 
-    def _API_response(self, code):
+    def _API_response(self, code, data=None):
         """
         Perpare the API response
         """
-        resp = [status_code for status_code in HTTPStatus if status_code.value == code]
-        if len(resp) == 1:
-            resp = resp[0]
-            return {
+        resp_code = [status_code for status_code in HTTPStatus if status_code.value == code]
+        if len(resp_code):
+            resp_code = resp_code[0]
+            resp = {
                 'result': {
-                    'code': resp.value,
-                    'message': resp.phrase,
-                    'description': resp.description
+                    'code': resp_code.value,
+                    'message': resp_code.phrase,
+                    'description': resp_code.description
                 }
             }
+        if data:
+            resp['data'] = data
+        return resp
 
     # Handle HTTP requests
     def do_GET(self):
@@ -172,7 +175,17 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             # if there is no parameter but an endpoint was matched, return all the data
             if self.path.endswith(SEPARATOR + endpoint_path): 
                     self._set_headers()
-                    self.wfile.write(bytes(json.dumps(self.data[self._get_data_key(endpoint_path, param)]), DEFAULT_ENCODING))
+                    self.wfile.write(
+                        bytes(
+                            json.dumps(
+                                self._API_response(
+                                    OK,
+                                    self.data[self._get_data_key(endpoint_path, param)]
+                                )
+                            ),
+                            DEFAULT_ENCODING
+                        )
+                    )
                     return
 
             # else a parameter value has been included in the request
@@ -182,11 +195,18 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             data_to_send = [i for i in self.data[self._get_data_key(endpoint_path, param)] if str(i[param]) == str(param_val)]
             if len(data_to_send) == 0:
                 continue
-            elif len(data_to_send) >= 1:
-                data_to_send = {'Items': data_to_send}
-
             self._set_headers()
-            self.wfile.write(bytes(json.dumps(data_to_send), DEFAULT_ENCODING))
+            self.wfile.write(
+                bytes(
+                    json.dumps(
+                        self._API_response(
+                            OK,
+                            data_to_send
+                        )
+                    ),
+                    DEFAULT_ENCODING
+                )
+            )
             return
 
         # Nothing matched the request
