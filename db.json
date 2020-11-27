@@ -59,6 +59,12 @@
     },
     {
       "id": 4,
+      "normalized_name": "hiangle",
+      "name": "Five Ten Hiangle W",
+      "price":"120"
+    },
+    {
+      "id": 5,
       "normalized_name": "instinct",
       "name": "Scarpa Instinct",
       "price":"135"

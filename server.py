@@ -124,6 +124,8 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         """
         Validate the body of a POST request.
         """
+        # check that the accessed endpoint accepts POST requests
+        # and that the request body is a valid format
         if type(current_data) != list or type(post_data) != dict:
             return CONFLICT
         # there is no parameter, no problem
@@ -133,8 +135,9 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
         if not post_data.get(param, ''): # Check if post body contains the parameter
             return BAD_REQUEST
         # There is a parameter and the body contains the parameter
-        if post_data.get(param, '') in [i[param] for i in current_data]: # check that the value isn't repeated
-            return CONFLICT
+        # check that the value isn't repeated
+        # if post_data.get(param, '') in [i[param] for i in current_data]:
+            # return CONFLICT
         return OK
 
     def _API_response(self, code):
@@ -179,8 +182,8 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             data_to_send = [i for i in self.data[self._get_data_key(endpoint_path, param)] if str(i[param]) == str(param_val)]
             if len(data_to_send) == 0:
                 continue
-            if len(data_to_send) == 1:
-                data_to_send = data_to_send[0]
+            elif len(data_to_send) >= 1:
+                data_to_send = {'Items': data_to_send}
 
             self._set_headers()
             self.wfile.write(bytes(json.dumps(data_to_send), DEFAULT_ENCODING))
