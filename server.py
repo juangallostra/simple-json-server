@@ -180,7 +180,12 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                             json.dumps(
                                 self._API_response(
                                     OK,
-                                    self.data[self._get_data_key(endpoint_path, param)]
+                                    self.data[
+                                        self._get_data_key(
+                                            endpoint_path, 
+                                            param
+                                        )
+                                    ]
                                 )
                             ),
                             DEFAULT_ENCODING
@@ -192,7 +197,13 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             _, param_val = self.path.rsplit(SEPARATOR, 1)
 
             # try to get value
-            data_to_send = [i for i in self.data[self._get_data_key(endpoint_path, param)] if str(i[param]) == str(param_val)]
+            data_to_send = [
+                i for i in self.data[
+                    self._get_data_key(
+                        endpoint_path, 
+                        param
+                    )
+                ] if str(i[param]) == str(param_val)]
             if len(data_to_send) == 0:
                 continue
             self._set_headers()
@@ -211,7 +222,14 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
 
         # Nothing matched the request
         self._set_headers(NOT_FOUND)
-        self.wfile.write(bytes(json.dumps(self._API_response(NOT_FOUND)), DEFAULT_ENCODING))
+        self.wfile.write(
+            bytes(
+                json.dumps(
+                    self._API_response(NOT_FOUND)
+                ), 
+                DEFAULT_ENCODING
+            )
+        )
         
     def do_POST(self):
         """
@@ -232,7 +250,9 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                         ).decode("UTF-8"))
 
                     try:
-                        current_data = self.data[self._get_data_key(endpoint, None)]
+                        current_data = self.data[
+                            self._get_data_key(endpoint, None)
+                        ]
                         status_code = self._validate_request(
                             param,
                             post_data, 
@@ -243,7 +263,9 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                             self._set_headers(status_code)
                             self.wfile.write(
                                 bytes(
-                                    json.dumps(self._API_response(status_code)), 
+                                    json.dumps(
+                                        self._API_response(status_code)
+                                    ), 
                                     DEFAULT_ENCODING
                                 )
                                 )
@@ -261,7 +283,9 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                     self._set_headers(status_code)
                     self.wfile.write(
                         bytes(
-                            json.dumps(self._API_response(status_code)),
+                            json.dumps(
+                                self._API_response(status_code)
+                            ),
                             DEFAULT_ENCODING
                         )
                     )
