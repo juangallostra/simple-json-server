@@ -158,6 +158,15 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
             resp['data'] = data
         return resp
 
+    def _send_response(self, code=OK, data=None):
+        self._set_headers(code)
+        self.wfile.write(
+            bytes(
+                json.dumps(self._API_response(code, data)),
+                DEFAULT_ENCODING
+            )
+        )
+
     # Handle HTTP requests
     def do_GET(self):
         """
@@ -173,25 +182,15 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                 continue
 
             # if there is no parameter but an endpoint was matched, return all the data
-            if self.path.endswith(SEPARATOR + endpoint_path): 
-                    self._set_headers()
-                    self.wfile.write(
-                        bytes(
-                            json.dumps(
-                                self._API_response(
-                                    OK,
-                                    self.data[
-                                        self._get_data_key(
-                                            endpoint_path, 
-                                            param
-                                        )
-                                    ]
-                                )
-                            ),
-                            DEFAULT_ENCODING
-                        )
+            if self.path.endswith(SEPARATOR + endpoint_path):
+                data = self.data[
+                    self._get_data_key(
+                        endpoint_path, 
+                        param
                     )
-                    return
+                ]
+                self._send_response(code=OK, data=data)
+                return
 
             # else a parameter value has been included in the request
             _, param_val = self.path.rsplit(SEPARATOR, 1)
@@ -206,30 +205,11 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                 ] if str(i[param]) == str(param_val)]
             if len(data_to_send) == 0:
                 continue
-            self._set_headers()
-            self.wfile.write(
-                bytes(
-                    json.dumps(
-                        self._API_response(
-                            OK,
-                            data_to_send
-                        )
-                    ),
-                    DEFAULT_ENCODING
-                )
-            )
+            self._send_response(code=OK, data=data_to_send)
             return
 
         # Nothing matched the request
-        self._set_headers(NOT_FOUND)
-        self.wfile.write(
-            bytes(
-                json.dumps(
-                    self._API_response(NOT_FOUND)
-                ), 
-                DEFAULT_ENCODING
-            )
-        )
+        self._send_response(code=NOT_FOUND)
         
     def do_POST(self):
         """
@@ -260,15 +240,7 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                         )
 
                         if status_code != OK:
-                            self._set_headers(status_code)
-                            self.wfile.write(
-                                bytes(
-                                    json.dumps(
-                                        self._API_response(status_code)
-                                    ), 
-                                    DEFAULT_ENCODING
-                                )
-                                )
+                            self._send_response(code=status_code)
                             return
 
                         # If valid, add object to list
@@ -280,24 +252,10 @@ class SimpleServerHandler(BaseHTTPRequestHandler):
                     except:
                         status_code = BAD_REQUEST
 
-                    self._set_headers(status_code)
-                    self.wfile.write(
-                        bytes(
-                            json.dumps(
-                                self._API_response(status_code)
-                            ),
-                            DEFAULT_ENCODING
-                        )
-                    )
+                    self._send_response(code=status_code)
 
         if not valid_path:
-            self._set_headers(NOT_FOUND)
-            self.wfile.write(
-                bytes(
-                    json.dumps(self._API_response(NOT_FOUND)), 
-                    DEFAULT_ENCODING
-                )
-            )
+            self._send_response(code=NOT_FOUND)
 
 class SimpleServer(HTTPServer):
     """
