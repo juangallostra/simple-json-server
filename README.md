@@ -6,7 +6,7 @@ This project was inspired by [tipycode's json-server](https://github.com/typicod
 
 It currently supports only `GET` and `POST` methods.
 
-More details can be found [here](https://bitesofcode.wordpress.com/2021/01/12/simple-http-mock-json-server-in-python/)
+More details can be found [here](https://bitesofcode.wordpress.com/2021/01/12/simple-http-mock-json-server-in-python/).
 
 ## Usage
 
